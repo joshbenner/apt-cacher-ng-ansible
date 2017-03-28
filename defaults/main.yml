@@ -1,0 +1,10 @@
+---
+apt_cacher_ng_cache_dir: /var/cache/apt-cacher-ng
+apt_cacher_ng_repos: []
+  # Example:
+  # - name: foo
+  #   proxy_urls:
+  #     - foo.example.com/repo
+  #     - /foo
+  #   origin_urls:
+  #     - foo.example.com/repo

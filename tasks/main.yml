@@ -1,0 +1,45 @@
+---
+- name: Install apt-cacher
+  become: yes
+  apt: name=apt-cacher-ng state=present
+  notify:
+    - restart apt-cacher
+
+- name: Create cache directory
+  become: yes
+  file:
+    path: "{{ apt_cacher_ng_cache_dir }}"
+    owner: apt-cacher-ng
+    group: apt-cacher-ng
+    state: directory
+    mode: u=rwx,g=rxs,o=rx
+  notify:
+    - restart apt-cacher
+
+- name: Configure cache directory
+  become: yes
+  copy:
+    dest: /etc/apt-cacher-ng/zzz_override.conf
+    owner: root
+    group: apt-cacher-ng
+    mode: u=rw,g=r,o=r
+    content: "CacheDir: {{ apt_cacher_ng_cache_dir }}"
+  notify:
+    - restart apt-cacher
+
+- name: Allow .asc download
+  become: yes
+  lineinfile:
+    path: /etc/apt-cacher-ng/acng.conf
+    line: 'PfilePatternEx: \.asc$'
+  notify:
+    - restart apt-cacher
+
+- name: Configure extra repos to cache
+  become: yes
+  template:
+    src: templates/repos.conf.j2
+    dest: /etc/apt-cacher-ng/repos.conf
+    owner: apt-cacher-ng
+    group: apt-cacher-ng
+    mode: u=rw,g=r,o=r
